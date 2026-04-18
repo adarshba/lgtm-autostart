@@ -1,0 +1,89 @@
+lgtm-autostart
+==============
+
+A local LGTM observability stack that starts automatically on macOS login.
+Loki + Grafana + Tempo + OTel Collector, wired together with Docker Compose,
+kicked off by a launchd agent so it's just there when you open your laptop.
+
+Source: https://github.com/adarshba/lgtm-autostart
+
+
+The problem
+-----------
+
+Every reboot meant manually starting the stack before any local telemetry
+would be collected. Half the time the stack wasn't running and logs were
+already lost. This repo fixes that.
+
+
+Stack
+-----
+
+  OTel Collector   otel/opentelemetry-collector-contrib:0.99.0   port 4317, 4318
+  Loki             grafana/loki:3.0.0                             port 3100
+  Tempo            grafana/tempo:2.4.1                            port 3200
+  Grafana          grafana/grafana:10.4.2                         port 3000
+
+Grafana runs with anonymous admin — no login required.
+
+
+Sending telemetry
+-----------------
+
+Point your OTel SDK at the collector:
+
+  OTLP gRPC   localhost:4317
+  OTLP HTTP   localhost:4318
+
+Logs are routed to Loki. Traces are routed to Tempo.
+
+
+macOS autostart
+---------------
+
+Copy the plist from example/ to your LaunchAgents folder:
+
+  cp example/com.user.lgtm-autostart.plist ~/Library/LaunchAgents/
+  launchctl load ~/Library/LaunchAgents/com.user.lgtm-autostart.plist
+
+Remove it:
+
+  launchctl unload ~/Library/LaunchAgents/com.user.lgtm-autostart.plist
+  rm ~/Library/LaunchAgents/com.user.lgtm-autostart.plist
+
+Agent logs:
+
+  /tmp/otel-stack.log
+  /tmp/otel-stack.error.log
+
+
+Manual start/stop
+-----------------
+
+  docker compose up -d
+  docker compose down
+
+
+File layout
+-----------
+
+  docker-compose.yml     service definitions
+  loki.yml               Loki configuration
+  otel-collector.yml     collector pipeline (OTLP → Loki + Tempo)
+  tempo.yml              Tempo configuration
+  example/
+    com.user.lgtm-autostart.plist   launchd agent
+
+
+Config changes
+--------------
+
+All config files are volume-mounted. Edit and restart:
+
+  docker compose down && docker compose up -d
+
+
+License
+-------
+
+MIT

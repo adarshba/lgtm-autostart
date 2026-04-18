@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.lgtm-autostart</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/sh</string>
+        <string>-c</string>
+        <string>cd "$LGTM_STACK_DIR" &amp;&amp; /usr/local/bin/docker compose up -d</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>LGTM_STACK_DIR</key>
+        <string>/Users/adarsh.ba/breeze/lgtm-autostart</string>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/otel-stack.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/otel-stack.error.log</string>
+</dict>
+</plist>
